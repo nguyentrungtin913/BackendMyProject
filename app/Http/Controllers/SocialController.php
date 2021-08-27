@@ -19,6 +19,6 @@ class SocialController extends Controller
     public function callback_facebook()
     {
         $provider = Socialite::driver('facebook')->user();
-        return view('index')->with('message', 'Đăng nhập Admin thành công');
+        return "Có cái nịt";
     }
 }
