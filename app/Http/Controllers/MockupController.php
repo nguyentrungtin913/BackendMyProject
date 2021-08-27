@@ -50,7 +50,7 @@ class MockupController extends Controller
         unset($newArr[$length-3]);
         $newStr = implode("/",$newArr);
 
-        $path="./".$newStr."/storage/app/public/cache/".$image.".jpg";
+        $path="./".$newStr."/storage/app/public/cache/";
         echo ($path);
 
        //return view('Mockup.RenderMockup')->with(compact('mockup'));
