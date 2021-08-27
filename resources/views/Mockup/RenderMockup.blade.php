@@ -8,7 +8,7 @@
 <body>
 
     <form style="width: 30%; margin: auto;" enctype="multipart/form-data" action="{{URL::to('/render/'.$mockup->mockup_id)}}" method="post">
-        csrf_field()
+        @csrf
         <img src="{{URL::to('storage/app/public/mockup/'.$mockup->mockupType['type_name'].'/'.$mockup->mockup_name.'?nocache='.time())}}" height="400" >
         <div class="mb-3">
             <label  class="form-label">Image</label>
