@@ -76,9 +76,9 @@ class MockupController extends Controller
 
         $image = $this->random->character(10);
 
-        $path="/storage/app/public/cache/".$image.".jpg";
+        $path="./storage/app/public/cache/".$image.".jpg";
 
-
+//        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
         $render->writeImages($path, true);
         $request->session()->put('image', $image);
         $request->session()->put('mockupId', $mockupId);
