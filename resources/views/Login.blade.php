@@ -7,11 +7,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-	<form style="width:50%; margin:auto;" action="{{URL::to('/auth')}}" method="post">
-        {{ csrf_field() }}
+	<form style="width:50%; margin:auto;" action="{{URL::to('/auth')}}" method="post" enctype="multipart/form-data" >
+        @csrf
 	  <div class="mb-3">
 	    <label for="exampleInputEmail1" class="form-label">Email address</label>
-	    <input type="email" class="form-control" name="email" >
+	    <input type="email" class="form-control" name="email"  value="nguyentrungtin913@gmail.com">
 	    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
 	  </div>
 	  <div class="mb-3">
