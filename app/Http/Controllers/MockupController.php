@@ -83,7 +83,7 @@ class MockupController extends Controller
         $newStr = implode("/",$newArr);
 
         $path="./".$newStr."/storage/app/public/cache/".$image.".jpg";
-        dd($path);
+        echo ($path);
 //        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
 
         $render->writeImages($path, true);
