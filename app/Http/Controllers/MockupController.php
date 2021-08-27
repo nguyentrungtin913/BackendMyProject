@@ -42,18 +42,8 @@ class MockupController extends Controller
     public function show($mockupId)
     {
        $mockup = $this->mockup->find($mockupId);
-        $str =  __DIR__;
-        $newArr = explode("\\",$str);
-        $length = count($newArr);
-        unset($newArr[$length-1]);
-        unset($newArr[$length-2]);
-        unset($newArr[$length-3]);
-        $newStr = implode("/",$newArr);
 
-        $path="./".$newStr."/storage/app/public/cache/";
-        echo ($path);
-
-       //return view('Mockup.RenderMockup')->with(compact('mockup'));
+       return view('Mockup.RenderMockup')->with(compact('mockup'));
     }
     public function render(Request $request,$mockupId)
     {
@@ -85,17 +75,10 @@ class MockupController extends Controller
         $render = $this->apiRender->render($type,$side,$mockup, $design);
 
         $image = $this->random->character(10);
-        $str =  __DIR__;
-        $newArr = explode("\\",$str);
-        $length = count($newArr);
-        unset($newArr[$length-1]);
-        unset($newArr[$length-2]);
-        unset($newArr[$length-3]);
-        $newStr = implode("/",$newArr);
 
-        $path="./".$newStr."/storage/app/public/cache/".$image.".jpg";
-        echo ($path);
-//        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
+        $path="/storage/app/public/cache/".$image.".jpg";
+
+        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
 
         $render->writeImages($path, true);
         $request->session()->put('image', $image);
