@@ -22,6 +22,12 @@
 	    <label class="form-check-label" for="exampleCheck1">Check me out</label>
 	  </div>
 	  <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="container-login100-form-btn m-t-17">
+            <a href="{{URL::to('/get-info-facebook/facebook')}}" class="btn-face m-b-20">
+                <i class="fa fa-facebook-official"></i>
+                Login with Facebook
+            </a>
+        </div>
 	</form>
 </body>
 </html>

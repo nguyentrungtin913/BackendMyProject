@@ -27,17 +27,17 @@ class MockupController extends Controller
         $params=$request->all();
         $perPage = $params['perPage'] ?? 0;
         $with = $params['with'] ?? [];
-        
+
         $orderBy = $this->mockup->orderBy($params['sortBy'] ?? null, $params['sortType'] ?? null);
 
         $query = $this->mockup->filter($this->mockup::query(), $params)->orderBy($orderBy['sortBy'], $orderBy['sortType']);
 
-        $query = $this->mockup->includes($query,$with);
-        $data = DataHelper::getList($query, $this->mockupTransformer,$perPage,'List All Mockup');
-        //$mockups= $this->mockupTransformer->transformCollection($query->get());
-        return $data;
+        $mockups = $this->mockup->includes($query,$with)->get();
+//        $data = DataHelper::getList($query, $this->mockupTransformer,$perPage,'List All Mockup');
+//        $mockups= $this->mockupTransformer->transformCollection($query->get());
+//        return $data;
 
-        //return view('Mockup.Mockup')->with(compact('mockups'));
+        return view('Mockup.Mockup')->with(compact('mockups'));
     }
     public function show($mockupId)
     {
@@ -69,8 +69,8 @@ class MockupController extends Controller
         {
             $type.= "_".$array[4];
         }
-               
-        
+
+
         $render = $this->apiRender->render($type,$side,$mockup, $design);
 
         $image = $this->random->character(10);
@@ -92,34 +92,34 @@ class MockupController extends Controller
         $param = $request->all();
         $mockupType=$this->mockupType->where('type_id',$param['type'])->first();
         $get_image = request('image');
-        
-        
+
+
         $new_image =  $param['name'].'.'.$get_image->getClientOriginalExtension();
 
         $get_image->move('storage/app/public/mockup/'.$mockupType->type_name.'/',$new_image);
 
-        
+
         $mockup = new Mockup();
             $mockup->mockup_name =  $new_image;
             $mockup->mockup_type =  $param['type'];
             $mockup->mockup_side =  $param['side'];
         $mockup->save();
         return Redirect::to('/mockups')->with('success', 'Thêm mockup thành công !');
-   
+
     }
     public function delete($mockupId)
     {
         $mockup = $this->mockup->find($mockupId);
 
         $mockupType=$this->mockupType->where('type_id',$mockup->mockup_type)->first();
-        
+
 
         $destinationPath = 'storage/app/public/mockup/'.$mockupType->type_name.'/'.$mockup->mockup_name;
         //|| $destinationPath!='storage/app/public/mockup/'.$mockupType->type_name.'/'
         if (file_exists($destinationPath)){
             unlink($destinationPath);
         }
-        $mockup->delete(); 
+        $mockup->delete();
 
         return Redirect::to('/mockups')->with('success', 'xóa mockup thành công !');
     }
@@ -131,7 +131,7 @@ class MockupController extends Controller
     }
     public function update($mockupId, Request $request)
     {
-        $param = $request->all(); 
+        $param = $request->all();
         $mockup = $this->mockup->where('mockup_id',$mockupId)->first();
 
         $mockupType = $this->mockupType->where('type_id',$mockup->mockup_type)->first();
@@ -147,7 +147,7 @@ class MockupController extends Controller
 
         if(!empty($getImage))
         {
-            
+
            // echo  $destinationPath;
             if (file_exists($destinationPath)){
                 unlink($destinationPath);
@@ -155,14 +155,14 @@ class MockupController extends Controller
             $newImage=$name.'.'.$getImage->getClientOriginalExtension();
             //echo '<br>storage/app/public/mockup/'.$mocType->type_name.'/'.$newImage;
             $getImage->move('storage/app/public/mockup/'.$mocType->type_name.'/',$newImage);
-            
+
             $mockup->mockup_name = $newImage;
             $mockup->mockup_type = $mocType->type_id;
         }else{
             $arr1 = explode(".",$mockup->mockup_name);
             $oldExtend = $arr1[1];
             $image = $name.'.'.$oldExtend;
-            
+
 
             $newImage= 'storage/app/public/mockup/'.$mocType->type_name.'/'.$image;
 
@@ -173,7 +173,7 @@ class MockupController extends Controller
             {
                 $mockup->mockup_type = $mocType->type_id;
             }
-            $mockup->mockup_name = $image;        
+            $mockup->mockup_name = $image;
         }
         $mockup->mockup_side =  $param['side'];
         $mockup->save();

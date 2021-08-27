@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//social
+Route::get('/get-info-facebook/{social}', 'App\Http\Controllers\SocialController@getInfo' );
+Route::get('/check-info-facebook/{social}', 'App\Http\Controllers\SocialController@callback_facebook' );
+
+
 Route::get('/index', function () {
     return "hello";
 });
