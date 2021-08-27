@@ -42,7 +42,18 @@ class MockupController extends Controller
     public function show($mockupId)
     {
        $mockup = $this->mockup->find($mockupId);
-       return view('Mockup.RenderMockup')->with(compact('mockup'));
+        $str =  __DIR__;
+        $newArr = explode("\\",$str);
+        $length = count($newArr);
+        unset($newArr[$length-1]);
+        unset($newArr[$length-2]);
+        unset($newArr[$length-3]);
+        $newStr = implode("/",$newArr);
+
+        $path="./".$newStr."/storage/app/public/cache/".$image.".jpg";
+        echo ($path);
+
+       //return view('Mockup.RenderMockup')->with(compact('mockup'));
     }
     public function render(Request $request,$mockupId)
     {
