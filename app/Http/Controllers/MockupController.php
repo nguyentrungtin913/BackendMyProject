@@ -78,7 +78,6 @@ class MockupController extends Controller
 
         $path="/storage/app/public/cache/".$image.".jpg";
 
-        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
 
         $render->writeImages($path, true);
         $request->session()->put('image', $image);
