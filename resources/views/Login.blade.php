@@ -7,7 +7,7 @@
 </head>
 <body>
 	<form style="width:50%; margin:auto;" action="{{URL::to('/auth')}}" method="post">
-        csrf_field()
+		 @csrf
 	  <div class="mb-3">
 	    <label for="exampleInputEmail1" class="form-label">Email address</label>
 	    <input type="email" class="form-control" name="email" >
