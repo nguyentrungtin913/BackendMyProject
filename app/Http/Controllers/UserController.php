@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Auth;
+use Session;
 
+session_start();
 use Illuminate\Support\Facades\Redirect;
 class UserController extends Controller
 {

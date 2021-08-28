@@ -4,13 +4,14 @@
 	<meta charset="utf-8">
 	<title>Login</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
 </head>
 <body>
-	<form style="width:50%; margin:auto;" action="{{URL::to('/auth')}}" method="post">
-		 @csrf
+	<form style="width:50%; margin:auto;" action="{{URL::to('/auth')}}" method="post" >
+        @csrf
 	  <div class="mb-3">
 	    <label for="exampleInputEmail1" class="form-label">Email address</label>
-	    <input type="email" class="form-control" name="email" >
+	    <input type="email" class="form-control" name="email"  value="nguyentrungtin913@gmail.com">
 	    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
 	  </div>
 	  <div class="mb-3">

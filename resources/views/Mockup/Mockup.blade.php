@@ -8,7 +8,7 @@
 <body>
    <a href="{{URL::to('/create-mockup')}}">Add mockup</a>
     <div style="width:98%;margin: auto;text-align: center;">
-         
+
       @foreach($mockups as $key => $mockup)
         <div style="border: solid thin gray;float: left; margin:3% 0 0 3%;">
             <a href="{{URL::to('/show-mockup/'.$mockup->mockup_id)}}">
@@ -23,6 +23,6 @@
         </div>
         @endforeach
     </div>
-    
+
 </body>
 </html>

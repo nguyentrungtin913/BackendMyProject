@@ -42,6 +42,7 @@ class MockupController extends Controller
     public function show($mockupId)
     {
        $mockup = $this->mockup->find($mockupId);
+
        return view('Mockup.RenderMockup')->with(compact('mockup'));
     }
     public function render(Request $request,$mockupId)
@@ -74,8 +75,10 @@ class MockupController extends Controller
         $render = $this->apiRender->render($type,$side,$mockup, $design);
 
         $image = $this->random->character(10);
-        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
 
+        $path="./storage/app/public/cache/".$image.".jpg";
+
+//        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
         $render->writeImages($path, true);
         $request->session()->put('image', $image);
         $request->session()->put('mockupId', $mockupId);
