@@ -61,7 +61,7 @@ Route::get('/cart','App\Http\Controllers\CartController@index');
 Route::get('/delete-cart/{cartId}','App\Http\Controllers\CartController@delete');
 //user
 Route::get('/login','App\Http\Controllers\UserController@login');
-Route::post('/auth','App\Http\Controllers\UserController@login');
+Route::post('/auth','App\Http\Controllers\UserController@authenticate');
 
 //product
 Route::get('/products','App\Http\Controllers\ProductController@index');

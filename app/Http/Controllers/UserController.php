@@ -21,18 +21,17 @@ class UserController extends Controller
     }
     public function authenticate(Request $request)
     {
-//        $param = $request->all();
-//        if (Auth::attempt(
-//            [
-//                 'email' => $param['email'],
-//                 'password' => $param['password'],
-//            ])) {
-//            $user = $this->user->where('email',$param['email'])->first();
-//            $request->session()->put('user_id', $user->id);
-//            return Redirect::to('/all');
-//        }else{
-//            dd("fail") ;
-//        }
-        echo "here";
+        $param = $request->all();
+        if (Auth::attempt(
+            [
+                 'email' => $param['email'],
+                 'password' => $param['password'],
+            ])) {
+            $user = $this->user->where('email',$param['email'])->first();
+            $request->session()->put('user_id', $user->id);
+            return Redirect::to('/all');
+        }else{
+            dd("fail") ;
+        }
     }
 }
