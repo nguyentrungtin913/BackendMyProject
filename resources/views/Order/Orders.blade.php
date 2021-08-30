@@ -31,7 +31,7 @@
             <input name ="id" value="{{$order->order_id}}" hidden>
         <tr>
             <th scope="row">1</th>
-            <td>{{$order->user['name']}}</td>
+            <td>{{$order->user->name}}</td>
             <td>{{$order->order_name}}</td>
             <td>{{$order->order_address}}</td>
             <td>{{$order->order_total}}</td>
