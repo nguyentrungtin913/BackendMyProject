@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends BaseModel
 {
     use HasFactory;
-    protected $table='order';
+    protected $table='tb_order';
     protected $primaryKey = 'order_id';
     public $timestamps = false;
 
