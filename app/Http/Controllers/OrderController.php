@@ -113,7 +113,8 @@ class OrderController extends Controller
             {
                 if(!is_dir($newPath))
                 {
-                    mkdir($newPath,'0777', true);
+                    mkdir($newPath,0777, true);
+                    chmod($newPath, 0777);
                 }
                 if (file_exists($oldPath)){
                     rename($oldPath, $newPath."/".$newImage);
