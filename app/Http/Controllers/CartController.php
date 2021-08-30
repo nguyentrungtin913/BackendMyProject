@@ -19,7 +19,7 @@ class CartController extends Controller
     public function index()
     {
         $carts = $this->cart->get();
-        return view('Cart.Carts')->with(compact('carts'));
+        return view('Cart.Cart')->with(compact('carts'));
     }
     public function edit(){
         $cart = $this->cart->where('cart_id', $cartId)->first();
