@@ -6,6 +6,7 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 </head>
 <body>
+
 	<table class="table table-hover" style="text-align:center;">
   <thead>
     <tr>
@@ -42,16 +43,16 @@
 	    		break;
 	    }
 	    ?>
-    	
+
     </td>
       <td>{{$order->order_date}}</td>
       <td><a href="" class="btn btn-outline-success">Detail</a></td>
-      <td>@if($order->order_status == 0) <a href="{{URL::to('/delete-order/'.$order->order_id)}}" class="btn btn-outline-danger">Cancel</a> @endif</td>
+      <td>@if($order->order_status == 0) <a href="{{URL::to('/delete-order/'.$order->order_id)}}" class="btn btn-outline-danger">Delete</a> @endif</td>
     </tr>
     @endforeach
-    
-   
-   
+
+
+
   </tbody>
 </table>
 </body>

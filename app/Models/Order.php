@@ -11,4 +11,9 @@ class Order extends BaseModel
     protected $table='order';
     protected $primaryKey = 'order_id';
     public $timestamps = false;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id','id');
+    }
 }

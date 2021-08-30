@@ -20,9 +20,9 @@ class MockupTypeController extends Controller
     public function index()
     {
         $mockupTypes= $this->mockupType->get();
-        $mockupTypes= $this->mockupTypeTransformer->transformCollection($mockupTypes);
-        return $mockupTypes;
-        //return view('MockupType.MockupType')->with(compact('mockupTypes'));
+//        $mockupTypes= $this->mockupTypeTransformer->transformCollection($mockupTypes);
+//        return $mockupTypes;
+        return view('MockupType.MockupType')->with(compact('mockupTypes'));
     }
     public function find($typeId)
     {
@@ -30,6 +30,6 @@ class MockupTypeController extends Controller
        $mockups = $mockupType->mockup()->get();
        return view('Mockup.Mockup')->with(compact('mockups'));
     }
-   
-    
+
+
 }
