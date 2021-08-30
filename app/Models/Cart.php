@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\belongsTo;
 
 class Cart extends BaseModel
 {
@@ -13,6 +14,6 @@ class Cart extends BaseModel
     protected $primaryKey = 'cart_id';
     public function mockup()
     {
-        return $this->hasOne(Mockup::class,'mockup_id','mockup_id');
+        return $this->belongsTo(Mockup::class,'mockup_id','mockup_id');
     }
 }
