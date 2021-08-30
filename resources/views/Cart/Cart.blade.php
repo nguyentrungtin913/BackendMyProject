@@ -24,8 +24,7 @@
         <div style="border: solid thin gray;float: left; margin:3% 0 0 3%; width: 20%;">
 
             <img src='{{URL::to("storage/app/public/cart/".$folder."/".$cart->cart_image."?nocache=".time())}}' height="190" width=100%>
-            <p>Price: {{$cart->mockup['mockup_price']}} đ</p>
-{{--            <p>Price: {{number_format($cart->mockup['mockup_price'],0)}} đ</p>--}}
+            <p>Price: {{number_format($cart->mockup->mockup_price,0)}} đ</p>
             <!-- <p>Amount: <input style="width:20%" type="number" name="amount" value="1" min="1"></p> -->
             <div style="width: 100%;padding: auto;margin: 1%;text-align: center;" >
                 <a href="{{URL::to('/create-order/'.$cart->cart_id)}}" class="btn btn-outline-success">Buy</a>
