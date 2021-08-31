@@ -105,7 +105,7 @@ class OrderController extends Controller
             $newImage = $order->id.'-'.$image;
 
             $orderDetail = new OrderDetail();
-                $orderDetail->id = $order->id;
+                $orderDetail->order_id = $order->order_id;
                 $orderDetail->image = $newImage;
                 $orderDetail->price = $price;
                 $orderDetail->amount = $amount;
