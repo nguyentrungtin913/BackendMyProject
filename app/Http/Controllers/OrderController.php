@@ -23,7 +23,7 @@ class OrderController extends Controller
     }
 
     public function index(){
-        $orders = $this->order->get();
+        $orders = $this->order->with['user']->get();
 //        foreach ($orders as $key => $value)
 //        {
 //            echo $key."-".$value;
