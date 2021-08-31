@@ -23,12 +23,7 @@ class OrderController extends Controller
     }
 
     public function index(){
-        $orders = $this->order->with['user']->get();
-//        foreach ($orders as $key => $value)
-//        {
-//            echo $key."-".$value;
-//        }
-
+        $orders = $this->order->with('user')->get();
         return view('Order.Orders')->with(compact('orders'));
     }
     public function update(Request $request){
