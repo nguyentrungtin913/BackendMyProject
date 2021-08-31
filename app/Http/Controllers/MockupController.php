@@ -114,10 +114,10 @@ class MockupController extends Controller
     {
         $mockup = $this->mockup->find($mockupId);
 
-        $mockupType=$this->mockupType->where('type_id',$mockup->mockup_type)->first();
+        //$mockupType=$this->mockupType->where('type_id',$mockup->mockup_type)->first();
 
 
-        $destinationPath = 'storage/app/public/mockup/'.$mockupType->type_name.'/'.$mockup->mockup_name;
+        $destinationPath = 'storage/app/public/mockup/'.$mockup->mockupType['type_name'].'/'.$mockup->mockup_name;
         //|| $destinationPath!='storage/app/public/mockup/'.$mockupType->type_name.'/'
         if (file_exists($destinationPath)){
             unlink($destinationPath);

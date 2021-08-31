@@ -12,7 +12,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'users';
+    public $timestamps = false;
+    protected $primaryKey = 'id';
 
-
+    public function orders()
+    {
+        return $this->hasMany(Order::class,'user_id','id');
+    }
 
 }

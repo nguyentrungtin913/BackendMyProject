@@ -12,30 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/cc', function () {
-    Artisan::call('cache:clear');
-    echo '<script>alert("cache clear Success")</script>';
-});
-Route::get('/ccc', function () {
-    Artisan::call('config:cache');
-    echo '<script>alert("config cache Success")</script>';
-});
-Route::get('/vc', function () {
-    Artisan::call('view:clear');
-    echo '<script>alert("view clear Success")</script>';
-});
-Route::get('/cr', function () {
-    Artisan::call('route:cache');
-    echo '<script>alert("route clear Success")</script>';
-});
-Route::get('/coc', function () {
-    Artisan::call('config:clear');
-    echo '<script>alert("config clear Success")</script>';
-});
-Route::get('/storage123', function () {
-    Artisan::call('storage:link');
-    echo '<script>alert("linked")</script>';
-});
 
 //social
 Route::get('/get-info-facebook/{social}', 'App\Http\Controllers\SocialController@getInfo' );
@@ -47,17 +23,21 @@ Route::get('/index', function () {
 });
 //index
 Route::get('/all', function (){
-    return view('index');
+    return view('Admin');
 })->middleware('checkLogout');
 //order
+Route::post('/many-updates','App\Http\Controllers\OrderController@manyUpdate');
+Route::post('/update','App\Http\Controllers\OrderController@Update');
 Route::get('/create-order/{cartId}','App\Http\Controllers\OrderController@insert');
 Route::post('/save-order','App\Http\Controllers\OrderController@save');
-Route::get('/order','App\Http\Controllers\OrderController@index');
+Route::get('/order','App\Http\Controllers\OrderController@getByUserId');
+Route::get('/orders','App\Http\Controllers\OrderController@index');
 Route::get('/delete-order/{orderId}','App\Http\Controllers\OrderController@delete');
 
 //cart
 Route::get('/create-cart','App\Http\Controllers\CartController@save');
 Route::get('/cart','App\Http\Controllers\CartController@index');
+Route::get('/edit-cart/{cartId}','App\Http\Controllers\CartController@edit');
 Route::get('/delete-cart/{cartId}','App\Http\Controllers\CartController@delete');
 //user
 Route::get('/login','App\Http\Controllers\UserController@login');

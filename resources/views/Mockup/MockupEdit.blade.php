@@ -12,7 +12,7 @@
               style="text-align: center; width:300px; margin-top: 10px;"
               src="{{URL::to('storage/app/public/mockup/'.$mockup->mockupType['type_name'].'/'.$mockup->mockup_name.'?nocache='.time())}}" />
 </div>
-<form style="width: 30%; margin: auto;" enctype="multipart/form-data" 
+<form style="width: 30%; margin: auto;" enctype="multipart/form-data"
 		 action="{{URL::to('/update-mockup/'.$mockup->mockup_id)}}" method="post">
 	  @csrf
 	<h1>Add Mockup</h1>
@@ -28,9 +28,9 @@
     <label  class="form-label">Type mockup</label>
     <select name = "type" class="form-control">
           <option>--Choose--</option>
-      @foreach($mockupTypes as $key => $mockupType) 
-          <option value="{{$mockupType->type_id}}" 
-            @if(($mockupType->type_id) == ($mockup->mockup_type))
+      @foreach($mockupTypes as $key => $mockupType)
+          <option value="{{$mockupType->type_id}}"
+            @if(($mockupType->type_id) == ($mockup->mockupType['type_id']))
               {{'selected'}}
             @endif
             >{{$mockupType->type_name}}</option>
@@ -45,7 +45,7 @@
 </form>
 
 <script type="text/javascript">
-    
+
     function showMyImage(fileInput) {
       var files = fileInput.files;
       for (var i = 0; i < files.length; i++) {

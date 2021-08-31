@@ -21,6 +21,53 @@ class OrderController extends Controller
         $this->orderValidator = $orderValidator;
         $this->mockupTransformer = $mockupTransformer;
     }
+
+    public function index(){
+        $orders = $this->order->with('user')->get();
+        return view('Order.Orders')->with(compact('orders'));
+    }
+    public function update(Request $request){
+
+        $param = $request->all();
+        $id = $param['id'];
+        $status = $param['status'];
+
+        if (!$this->orderValidator->update($id, $status)) {
+            $errors = $this->orderValidator->getErrors();
+            return Redirect::to('/orders')->with(compact('errors'));
+        }
+        $order = $this->order->where('order_id', $id)->first();
+            $order->order_status = $status;
+        $order->save();
+        return Redirect::to('/orders')->with('success', 'update thành công !');
+    }
+    public function manyUpdate(Request $request)
+    {
+        $param = $request->all();
+
+        $k=$param['key'];
+        $v=$param['value'];
+
+        $key = explode(',',$k);
+        array_shift($key);
+
+        $values = explode(',',$v);
+        array_shift($values);
+
+        $arr = array_combine($key,$values);
+
+        if (!$this->orderValidator->updates($arr)) {
+            $errors = $this->orderValidator->getErrors();
+            return Redirect::to('/orders')->with(compact('errors'));
+        }
+
+        foreach ($arr as $key => $value) {
+            $order = $this->order->where('order_id', $key)->first();
+                $order->order_status = $value;
+            $order->save();
+        }
+        return Redirect::to('/orders')->with('success', 'update thành công !');
+    }
     public function insert($cartId)
     {
         $cart= $this->cart->where('cart_id',$cartId)->first();
@@ -28,8 +75,7 @@ class OrderController extends Controller
     }
 
     public function save(Request $request)
-    { 
-        
+    {
         if (!$this->orderValidator->setRequest($request)->store()) {
             $errors = $this->orderValidator->getErrors();
             return Redirect::to('/cart')->with(compact('errors'));
@@ -37,7 +83,7 @@ class OrderController extends Controller
         $param = $request->all();
         $userId = Session::get('user_id') ?? 0;
         $folder=md5($userId);
-       
+
         $image = $param['image'];
         $name = $param['name'];
         $address = $param['address'];
@@ -56,7 +102,7 @@ class OrderController extends Controller
             $order->user_id=$userId;
         if($order->save())
         {
-            $newImage = $order->order_id.'-'.$image;
+            $newImage = $order->id.'-'.$image;
 
             $orderDetail = new OrderDetail();
                 $orderDetail->order_id = $order->order_id;
@@ -67,7 +113,8 @@ class OrderController extends Controller
             {
                 if(!is_dir($newPath))
                 {
-                    mkdir($newPath,'0777', true);
+                    mkdir($newPath,0777, true);
+                    chmod($newPath, 0777);
                 }
                 if (file_exists($oldPath)){
                     rename($oldPath, $newPath."/".$newImage);
@@ -84,9 +131,9 @@ class OrderController extends Controller
         }
         return Redirect::to('/order')->with('success', 'xóa thành công !');
     }
-    public function index()
+    public function getByUserId()
     {
-       $userId = Session::get('user_id') ?? 0; 
+       $userId = Session::get('user_id') ?? 0;
 
        $orders = $this->order->where('user_id', $userId)->get();
        return view('Order.Order')->with(compact('orders'));
@@ -106,6 +153,6 @@ class OrderController extends Controller
             $orderDetail->delete();
         }
         $order->delete();
-        return Redirect::to('/order')->with('success', 'xóa thành công !');
+        return Redirect::to('/orders')->with('success', 'xóa thành công !');
     }
 }
