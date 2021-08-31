@@ -12,7 +12,7 @@
       @foreach($mockups as $key => $mockup)
         <div style="border: solid thin gray;float: left; margin:3% 0 0 3%;">
             <a href="{{URL::to('/show-mockup/'.$mockup->mockup_id)}}">
-                <img src='{{URL::to("storage/app/public/mockup/".$mockup->mockupType["type_name"]."/".$mockup->mockup_name."?nocache=".time())}}' height="170" width="220">
+                <img src='{{URL::to("storage/app/public/mockup/".$mockup->mockupType->type_name."/".$mockup->mockup_name."?nocache=".time())}}' height="170" width="220">
             </a>
             <p>{{number_format($mockup->mockup_price,0)}} đ</p>
             <div style="width: 100%;padding: auto;margin: 1%;text-align: center;" >
