@@ -36,7 +36,7 @@ class OrderController extends Controller
             $errors = $this->orderValidator->getErrors();
             return Redirect::to('/orders')->with(compact('errors'));
         }
-        $order = $this->order->where('id', $id)->first();
+        $order = $this->order->where('order_id', $id)->first();
             $order->order_status = $status;
         $order->save();
         return Redirect::to('/orders')->with('success', 'update thành công !');
@@ -62,7 +62,7 @@ class OrderController extends Controller
         }
 
         foreach ($arr as $key => $value) {
-            $order = $this->order->where('id', $key)->first();
+            $order = $this->order->where('order_id', $key)->first();
                 $order->order_status = $value;
             $order->save();
         }
@@ -140,9 +140,9 @@ class OrderController extends Controller
     }
     public function delete($orderId)
     {
-        $order = $this->order->where('id',$orderId)->first();
+        $order = $this->order->where('order_id',$orderId)->first();
         $foder = str_replace('-', '/',  $order->order_date);
-        $orderDetails = $this->orderDetail->where('id',$orderId)->get();
+        $orderDetails = $this->orderDetail->where('order_id',$orderId)->get();
         foreach($orderDetails as $key => $orderDetail)
         {
             $path = "storage/app/public/order/".$foder."/".$orderDetail->image;
