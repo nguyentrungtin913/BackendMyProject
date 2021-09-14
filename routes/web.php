@@ -72,5 +72,5 @@ Route::get('/image-render/','App\Http\Controllers\MockupController@imageRender')
 
 
 //mockuptype
-Route::get('/mockup-types','App\Http\Controllers\MockupTypeController@index');
+Route::get('/mockup-typ','App\Http\Controllers\MockupTypeController@index');
 Route::get('/mockup-type/{typeId}','App\Http\Controllers\MockupTypeController@find');
