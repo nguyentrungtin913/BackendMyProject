@@ -2,25 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
 //social
 Route::get('/get-info-facebook/{social}', 'App\Http\Controllers\SocialController@getInfo' );
 Route::get('/check-info-facebook/{social}', 'App\Http\Controllers\SocialController@callback_facebook' );
 
-
-Route::get('/index', function () {
-    return "hello";
-});
 //index
 Route::get('/all', function (){
     return view('Admin');
@@ -72,5 +57,7 @@ Route::get('/image-render/','App\Http\Controllers\MockupController@imageRender')
 
 
 //mockuptype
+
 Route::get('/mockup-types','App\Http\Controllers\MockupTypeController@index');
 Route::get('/mockup-type/{typeId}','App\Http\Controllers\MockupTypeController@find');
+Route::post('/mockup-type-add','App\Http\Controllers\MockupTypeController@save');

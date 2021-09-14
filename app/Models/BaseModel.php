@@ -11,13 +11,17 @@ class BaseModel extends Model
 {
     use HasFactory;
     const FILTER_PARAMS = [];
-    const CREATED_AT = 'mockup_id'; //lưu ý
+    const CREATED_AT = 'CREATED_AT'; //lưu ý
     public function getFieldByAlias($alias)
     {
         $aliasFlip = array_flip(static::ALIAS);
         return $aliasFlip[$alias] ?? null;
     }
 
+    public function create(array $attributes = [])
+    {
+        return static::query()->create($attributes);
+    }
    
     function orderBy($sortBy = 'createdAt', $sortType = 'desc')
     {

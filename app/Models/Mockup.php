@@ -12,12 +12,20 @@ class Mockup extends BaseModel
     public $timestamps = false;
     protected $table = 'mockup';
     protected $primaryKey = 'mockup_id';
+    protected $fillable = [
+        'mockup_name',
+        'mockup_side',
+        'mockup_price',
+        'mockup_path',
+        'type_id',
+    ];
 
     const ALIAS = [
         'mockup_id'        => 'id',
         'mockup_name'      => 'name',
         'mockup_side'      => 'side',
         'mockup_price'     => 'price',
+        'mockup_path'      => 'path',
         'type_id'          =>'typeId'
     ];
 

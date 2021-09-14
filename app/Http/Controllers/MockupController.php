@@ -32,12 +32,13 @@ class MockupController extends Controller
 
         $query = $this->mockup->filter($this->mockup::query(), $params)->orderBy($orderBy['sortBy'], $orderBy['sortType']);
 
-        $mockups = $this->mockup->includes($query,$with)->get();
-//        $data = DataHelper::getList($query, $this->mockupTransformer,$perPage,'List All Mockup');
-//        $mockups= $this->mockupTransformer->transformCollection($query->get());
-//        return $data;
+        // $mockups = $this->mockup->includes($query,$with)->get();
 
-        return view('Mockup.Mockup')->with(compact('mockups'));
+        $data = DataHelper::getList($query, $this->mockupTransformer,$perPage,'ListAllMockup');
+        $mockups= $this->mockupTransformer->transformCollection($query->get());
+        return $data;
+
+        // return view('Mockup.Mockup')->with(compact('mockups'));
     }
     public function show($mockupId)
     {
@@ -76,9 +77,9 @@ class MockupController extends Controller
 
         $image = $this->random->character(10);
 
-        $path="./storage/app/public/cache/".$image.".jpg";
+      //  $path="./storage/app/public/cache/".$image.".jpg"; //heroku
 
-//        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg";
+        $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg"; //local
         $render->writeImages($path, true);
         $request->session()->put('image', $image);
         $request->session()->put('mockupId', $mockupId);
@@ -93,21 +94,31 @@ class MockupController extends Controller
     public function save(Request $request)
     {
         $param = $request->all();
-        $mockupType=$this->mockupType->where('type_id',$param['type'])->first();
+        $mockupType=$this->mockupType->where('type_id', $param['type'])->first();
         $get_image = request('image');
 
 
         $new_image =  $param['name'].'.'.$get_image->getClientOriginalExtension();
-
+        $path ='storage/app/public/mockup/'.$mockupType->type_name.'/'.$new_image;
         $get_image->move('storage/app/public/mockup/'.$mockupType->type_name.'/',$new_image);
 
 
-        $mockup = new Mockup();
-            $mockup->mockup_name =  $new_image;
-            $mockup->mockup_type =  $param['type'];
-            $mockup->mockup_side =  $param['side'];
-        $mockup->save();
-        return Redirect::to('/mockups')->with('success', 'Thêm mockup thành công !');
+        // $mockup = new Mockup();
+        //     $mockup->mockup_name =  $new_image;
+        //     $mockup->mockup_type =  $param['type'];
+        //     $mockup->mockup_side =  $param['side'];
+        // $mockup->save();
+        //return Redirect::to('/mockups')->with('success', 'Thêm mockup thành công !');
+        $mockup = $this->mockup->create([
+                'mockup_name' => $new_image,
+                'mockup_price'=> $param['price'],
+                'mockup_side' => $param['side'],
+                'mockup_path' => $path,
+                'type_id' => $param['type'],
+        ]);
+        return $param;
+
+        
 
     }
     public function delete($mockupId)
