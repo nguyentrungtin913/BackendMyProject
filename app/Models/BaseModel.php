@@ -11,7 +11,7 @@ class BaseModel extends Model
 {
     use HasFactory;
     const FILTER_PARAMS = [];
-    const CREATED_AT = 'CREATED_AT'; //lưu ý
+    const CREATED_AT = 'created_at'; //lưu ý
     public function getFieldByAlias($alias)
     {
         $aliasFlip = array_flip(static::ALIAS);
@@ -22,7 +22,7 @@ class BaseModel extends Model
     {
         return static::query()->create($attributes);
     }
-   
+
     function orderBy($sortBy = 'createdAt', $sortType = 'desc')
     {
         $sortType = strtolower($sortType);
@@ -42,7 +42,7 @@ class BaseModel extends Model
         }
         return $query;
     }
-    
+
     function filter(Builder $query, array $inputs)
     {
         $aliasFlip = array_flip(static::ALIAS);
