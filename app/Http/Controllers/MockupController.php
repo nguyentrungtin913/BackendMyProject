@@ -134,8 +134,9 @@ class MockupController extends Controller
             unlink($destinationPath);
         }
         $mockup->delete();
-
-        return Redirect::to('/mockups')->with('success', 'xóa mockup thành công !');
+        $mockup= $this->mockupTransformer->transformItem($mockup);
+        return $mockup;
+        //return Redirect::to('/mockups')->with('success', 'xóa mockup thành công !');
     }
     public function edit($mockupId)
     {

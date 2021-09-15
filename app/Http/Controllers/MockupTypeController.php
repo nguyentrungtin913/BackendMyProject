@@ -14,13 +14,13 @@ class MockupTypeController extends Controller
 {
     public function __construct(MockupType $mockupTypeModel, MockupTypeTransformer $mockupTypeTransformer)
     {
-       $this->mockupTypeModel= $mockupTypeModel;
-       $this->mockupTypeTransformer= $mockupTypeTransformer;
+        $this->mockupTypeModel = $mockupTypeModel;
+        $this->mockupTypeTransformer = $mockupTypeTransformer;
     }
 
     public function index(Request $request)
     {
-        $params=$request->all();
+        $params = $request->all();
         $perPage = $params['perPage'] ?? 0;
         $with = $params['with'] ?? [];
 
@@ -28,13 +28,13 @@ class MockupTypeController extends Controller
 
         $query = $this->mockupTypeModel->filter($this->mockupTypeModel::query(), $params)->orderBy($orderBy['sortBy'], $orderBy['sortType']);
 
-        
-        $data = DataHelper::getList($query, $this->mockupTypeTransformer,$perPage,'ListAllTypeMockup');
-        $mockups= $this->mockupTypeTransformer->transformCollection($query->get());
+
+        $data = DataHelper::getList($query, $this->mockupTypeTransformer, $perPage, 'ListAllTypeMockup');
+        //$mockups = $this->mockupTypeTransformer->transformCollection($query->get());
         return $data;
 
 
-        
+
         // $mockupTypes= $this->mockupType->get();
         // $mockupTypes= $this->mockupTypeTransformer->transformCollection($mockupTypes);
         // return $mockupTypes;
@@ -42,29 +42,41 @@ class MockupTypeController extends Controller
     }
     public function find($typeId)
     {
-       $mockupType = $this->mockupTypeModel->where('type_id',$typeId)->first();
-       $mockups = $mockupType->mockup()->get();
-       return view('Mockup.Mockup')->with(compact('mockups'));
+        $mockupType = $this->mockupTypeModel->where('type_id', $typeId)->first();
+        $mockupType = $this->mockupTypeTransformer->transformItem($mockupType);
+        return $mockupType;
+
     }
-    public function test(Request $request)
+    public function save(Request $request)
     {
-      //  $param = $request->all();
-      //  dd("aaaaaaaa");
-      //  $mockupType = $this->mockupTypeModel->create([
-      //    'type_name' => $param['name']
-      // ]);
-       $params=$request->all();
-        $perPage = $params['perPage'] ?? 0;
-        $with = $params['with'] ?? [];
+        $param = $request->all();
 
-        $orderBy = $this->mockupTypeModel->orderBy($params['sortBy'] ?? null, $params['sortType'] ?? null);
+        $mockupType = $this->mockupTypeModel->create([
+            'type_name' => $param['name']
+        ]);
 
-        $query = $this->mockupTypeModel->filter($this->mockupTypeModel::query(), $params)->orderBy($orderBy['sortBy'], $orderBy['sortType']);
+        $mockupType = $this->mockupTypeTransformer->transformItem($mockupType);
 
-        
-        $data = DataHelper::getList($query, $this->mockupTypeTransformer,$perPage,'ListAllTypeMockup');
-        $mockups= $this->mockupTypeTransformer->transformCollection($query->get());
-        return $data;
+        return $mockupType;
+    }
+
+    public function update(Request $request)
+    {
+        $param = $request->all();
+        $mockupType = $this->mockupTypeModel->where('type_id', $param['id'])->first();
+            $mockupType->type_name = $param['name'];
+        $mockupType->save();
+        $mockupType = $this->mockupTypeTransformer->transformItem($mockupType);
+
+        return $mockupType;
+    }
+
+    public function delete($typeId)
+    {
+        $mockupType = $this->mockupTypeModel->where('type_id', $typeId)->first();
+        $mockupType->delete();
+        $mockupType = $this->mockupTypeTransformer->transformItem($mockupType);
+        return $mockupType;
     }
 
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\hasMany;
+
 class MockupType extends BaseModel
 {
     public $timestamps = false;
@@ -13,8 +14,12 @@ class MockupType extends BaseModel
         'type_id'        => 'id',
         'type_name'      => 'name'
     ];
+
+    protected $fillable = [
+        'type_name',
+    ];
     public function mockup()
     {
-         return $this->hasMany(Mockup::class,'type_id','type_id');
+        return $this->hasMany(Mockup::class, 'type_id', 'type_id');
     }
 }
