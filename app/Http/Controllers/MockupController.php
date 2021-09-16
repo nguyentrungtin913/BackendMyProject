@@ -95,28 +95,51 @@ class MockupController extends Controller
     {
         $param = $request->all();
         $mockupType=$this->mockupType->where('type_id', $param['type'])->first();
+        
+
+
+
+        //Gui bang JSON
+
+        $image =request('image');
+   
+        $clientOriginalExtension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+
+        $newImage =  $param['name'].'.'.$clientOriginalExtension;
+
+        $folder = 'storage/app/public/mockup/'.$mockupType->type_name.'/';
+
+        if(!is_dir($folder)){
+            mkdir($folder, 0777, true);
+        }
+
+        \Image::make($request->get('image'))->save(public_path($folder).$newImage);
+
+        $path =$folder.$newImage;
+
+
+
+        /*
+        //Gui bang form
+
         $get_image = request('image');
-
-
         $new_image =  $param['name'].'.'.$get_image->getClientOriginalExtension();
         $path ='storage/app/public/mockup/'.$mockupType->type_name.'/'.$new_image;
         $get_image->move('storage/app/public/mockup/'.$mockupType->type_name.'/',$new_image);
+        */
 
 
-        // $mockup = new Mockup();
-        //     $mockup->mockup_name =  $new_image;
-        //     $mockup->mockup_type =  $param['type'];
-        //     $mockup->mockup_side =  $param['side'];
-        // $mockup->save();
+       
         //return Redirect::to('/mockups')->with('success', 'Thêm mockup thành công !');
         $mockup = $this->mockup->create([
-                'mockup_name' => $new_image,
+                'mockup_name' => $param['name'],
                 'mockup_price'=> $param['price'],
                 'mockup_side' => $param['side'],
                 'mockup_path' => $path,
                 'type_id' => $param['type'],
         ]);
-        return $param;
+        $mockup= $this->mockupTransformer->transformItem($mockup);
+        return $mockup;
 
         
 
@@ -138,61 +161,121 @@ class MockupController extends Controller
         return $mockup;
         //return Redirect::to('/mockups')->with('success', 'xóa mockup thành công !');
     }
-    public function edit($mockupId)
+    public function find($mockupId, Request $request)
     {
-         $mockup = $this->mockup->where('mockup_id',$mockupId)->first();
-         $mockupTypes = $this->mockupType->get();
-         return view('Mockup.MockupEdit')->with(compact('mockup','mockupTypes'));
+        $params = $request->all();
+        $with = $params['with'] ?? [];
+        $query = $this->mockup->where('mockup_id',$mockupId);
+        $mockup = $this->mockup->includes($query,$with)->first();
+        $mockup= $this->mockupTransformer->transformItem($mockup);
+        return $mockup;
     }
-    public function update($mockupId, Request $request)
+    public function update(Request $request)
     {
-        $param = $request->all();
-        $mockup = $this->mockup->where('mockup_id',$mockupId)->first();
+        $params = $request->all();
+        $image =  $params['image'] ?? null;
+        $id = $params['id'] ?? null;
+        $name=$params['name'] ?? null;
+        $side=$params['side'] ?? null;
+        $price=$params['price'] ?? null;
+        $type=$params['type'] ?? null;
 
-        $mockupType = $this->mockupType->where('type_id',$mockup->mockup_type)->first();
-        $getImage = request('image');
-        $typeNew = $param['type'];
-        $typeOld = $mockup->mockup_type;
+        $data =array(
+            'mockup_id' => $id,
+            'mockup_name' => $name,
+            'mockup_side' => $side,
+            'mockup_price' => $price, 
+            'type_id'=> $type
+        );
 
-        $arr = explode(".",$param['name']);
-        $name = $arr[0];
+        $mockup = $this->mockup->where('mockup_id',$params['id'])->first();
+        
+        $name = $name === null ? $mockup->mockup_name : $name ;
+        $mockupType = $this->mockupType->where('type_id',$params['type'])->first();
+        if($image){
+            
+            $clientOriginalExtension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+            $newImage =  $name.'.'.$clientOriginalExtension;
+            $newFolder = 'storage/app/public/mockup/'.$mockupType->type_name.'/';
 
-        $destinationPath = 'storage/app/public/mockup/'.$mockupType->type_name.'/'.$mockup->mockup_name;
-        $mocType = $this->mockupType->where('type_id',$typeNew)->first();
-
-        if(!empty($getImage))
-        {
-
-           // echo  $destinationPath;
-            if (file_exists($destinationPath)){
-                unlink($destinationPath);
+            if(file_exists($mockup->mockup_path)){
+                unlink($mockup->mockup_path);
             }
-            $newImage=$name.'.'.$getImage->getClientOriginalExtension();
-            //echo '<br>storage/app/public/mockup/'.$mocType->type_name.'/'.$newImage;
-            $getImage->move('storage/app/public/mockup/'.$mocType->type_name.'/',$newImage);
 
-            $mockup->mockup_name = $newImage;
-            $mockup->mockup_type = $mocType->type_id;
-        }else{
-            $arr1 = explode(".",$mockup->mockup_name);
-            $oldExtend = $arr1[1];
-            $image = $name.'.'.$oldExtend;
-
-
-            $newImage= 'storage/app/public/mockup/'.$mocType->type_name.'/'.$image;
-
-            if (file_exists($destinationPath)){
-                rename($destinationPath, $newImage);
+            if(!is_dir($newFolder)){
+                mkdir($newFolder, 0777, true);
             }
-            if($typeNew != $typeOld)
-            {
-                $mockup->mockup_type = $mocType->type_id;
+            \Image::make($request->get('image'))->save(public_path($newFolder).$newImage);
+            
+            $path =$newFolder.$newImage;
+
+            $mockup->mockup_path = $path;
+        }else if($type){
+            $arr =explode("/", $mockup->mockup_path);
+            $arr[count($arr)-2] = $mockupType->type_name;
+            $path = implode("/",$arr);
+
+            if (file_exists($mockup->mockup_path)){
+                rename($mockup->mockup_path, $path);
             }
-            $mockup->mockup_name = $image;
+
+            $mockup->mockup_path = $path;
         }
-        $mockup->mockup_side =  $param['side'];
+
+        foreach($data as $key => $value){
+            if($value){
+                $mockup->$key = $value;
+            }
+        }
         $mockup->save();
-        return Redirect::to('/mockups')->with('success', 'Cập nhật mockup thành công !');
+        $mockup= $this->mockupTransformer->transformItem($mockup);
+        return $mockup;  
+
+//////////////////////////
+        // $mockupType = $this->mockupType->where('type_id',$mockup->mockup_type)->first();
+        // $getImage = request('image');
+        // $typeNew = $param['type'];
+        // $typeOld = $mockup->mockup_type;
+
+        // $arr = explode(".",$param['name']);
+        // $name = $arr[0];
+
+        // $destinationPath = 'storage/app/public/mockup/'.$mockupType->type_name.'/'.$mockup->mockup_name;
+        // $mocType = $this->mockupType->where('type_id',$typeNew)->first();
+
+        // if(!empty($getImage))
+        // {
+
+        //    // echo  $destinationPath;
+        //     if (file_exists($destinationPath)){
+        //         unlink($destinationPath);
+        //     }
+        //     $newImage=$name.'.'.$getImage->getClientOriginalExtension();
+        //     //echo '<br>storage/app/public/mockup/'.$mocType->type_name.'/'.$newImage;
+        //     $getImage->move('storage/app/public/mockup/'.$mocType->type_name.'/',$newImage);
+
+        //     $mockup->mockup_name = $newImage;
+        //     $mockup->mockup_type = $mocType->type_id;
+        // }else{
+        //     $arr1 = explode(".",$mockup->mockup_name);
+        //     $oldExtend = $arr1[1];
+        //     $image = $name.'.'.$oldExtend;
+
+
+        //     $newImage= 'storage/app/public/mockup/'.$mocType->type_name.'/'.$image;
+
+        //     if (file_exists($destinationPath)){
+        //         rename($destinationPath, $newImage);
+        //     }
+        //     if($typeNew != $typeOld)
+        //     {
+        //         $mockup->mockup_type = $mocType->type_id;
+        //     }
+        //     $mockup->mockup_name = $image;
+        // }
+        // $mockup->mockup_side =  $param['side'];
+        // $mockup->save();
+        // return Redirect::to('/mockups')->with('success', 'Cập nhật mockup thành công !');
     }
     public function imageRender()
     {

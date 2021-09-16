@@ -46,12 +46,16 @@ Route::get('/delete-product-type/{typeId}','App\Http\Controllers\ProductTypeCont
 
 //mockup
 Route::get('/mockups','App\Http\Controllers\MockupController@index');
+Route::post('/mockup','App\Http\Controllers\MockupController@save');
+Route::get('/mockup/{mockupId}','App\Http\Controllers\MockupController@find');
+Route::put('/mockup','App\Http\Controllers\MockupController@update');
+
+
 Route::get('/show-mockup/{mockupId}','App\Http\Controllers\MockupController@show');
 Route::post('/render/{mockupId}','App\Http\Controllers\MockupController@render');
 Route::get('/create-mockup','App\Http\Controllers\MockupController@insert');
-Route::post('/save-mockup','App\Http\Controllers\MockupController@save');
+
 Route::delete('/mockup/{mockupId}','App\Http\Controllers\MockupController@delete');
-Route::get('/edit-mockup/{mockupId}','App\Http\Controllers\MockupController@edit');
 Route::post('/update-mockup/{mockupId}','App\Http\Controllers\MockupController@update');
 Route::get('/image-render/','App\Http\Controllers\MockupController@imageRender');
 
