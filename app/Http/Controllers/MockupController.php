@@ -95,9 +95,6 @@ class MockupController extends Controller
     {
         $param = $request->all();
         $mockupType=$this->mockupType->where('type_id', $param['type'])->first();
-        
-
-
 
         //Gui bang JSON
 
