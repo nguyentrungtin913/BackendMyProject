@@ -12,6 +12,20 @@ class Cart extends BaseModel
     protected $table = 'cart';
     public $timestamps = false;
     protected $primaryKey = 'cart_id';
+    protected $fillable = [
+        'cart_id',
+        'cart_image',
+        'mockup_id',
+        'user_id'
+    ];
+
+    const ALIAS = [
+        'cart_id'       => 'id',
+        'cart_image'    => 'image',
+        'mockup_id'     => 'mockupId',
+        'user_id'       => 'userId',
+    ];
+
     public function mockup()
     {
         return $this->belongsTo(Mockup::class,'mockup_id','mockup_id');

@@ -11,9 +11,31 @@ class Order extends BaseModel
     protected $table='tb_order';
     protected $primaryKey = 'order_id';
     public $timestamps = false;
+    protected $fillable = [
+        'order_name',
+        'order_address',
+        'order_total',
+        'order_status',
+        'order_date',
+        'user_id',
+    ];
+
+    const ALIAS = [
+        'order_id'        => 'id',
+        'order_name'      => 'name',
+        'order_address'   => 'address',
+        'order_total'     => 'total',
+        'order_status'    => 'status',
+        'order_date'      => 'date',
+        'user_id'         => 'userId'
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class,'user_id','id');
+    }
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class, 'order_id', 'order_id');
     }
 }

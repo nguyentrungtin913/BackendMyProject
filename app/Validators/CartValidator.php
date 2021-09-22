@@ -14,7 +14,7 @@ class CartValidator extends BaseValidator
 
     public function checkExitFile($image)
     {
-        if (!file_exists('storage/app/public/cache/'.$image)) 
+        if (!file_exists($image)) 
         {
             $this->setError(400, 'not exit', "file not exit", 'Error');
             return false;

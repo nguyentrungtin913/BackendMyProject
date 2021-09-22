@@ -40,14 +40,12 @@ class OrderValidator extends BaseValidator
         return true;
     }
     public function checkStatuses($arr){
-
         foreach ($arr as $v){
             if (!in_array($v, [0,1,2,3])) {
                 $this->setError(400, 'invalid_param', "Invalid param: status", "Status invalid");
                 return false;
             }
         }
-
         return true;
     }
 
@@ -88,6 +86,7 @@ class OrderValidator extends BaseValidator
             return true;
         }
     }
+   
 }
 
 ?>

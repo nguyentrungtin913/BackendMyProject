@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Underscore\Types\Arrays;
+use Illuminate\Support\Arr;
 
 class BaseModel extends Model
 {
     use HasFactory;
     const FILTER_PARAMS = [];
+    const NUMBER_FIELDS = []; //Format to number
+    const JSON_FIELDS = []; //Format to json
+
     const CREATED_AT = 'created_at'; //lưu ý
     public function getFieldByAlias($alias)
     {
@@ -88,5 +92,34 @@ class BaseModel extends Model
         }
 
         return $query;
+    }
+    public function revertAlias($data)
+    {
+        $return = [];
+        foreach (static::ALIAS as $field => $alias) {
+            if (($value = Arr::get($data, $alias)) !== null) {
+                Arr::set($return, $field, $value);
+            }
+        }
+
+        foreach (static::JSON_FIELDS as $alias) {
+            $field = static::getRealField($alias);
+            if (($value = Arr::get($return, $field)) !== null) {
+                Arr::set($return, $field, Parse::toJSON($value));
+            }
+        }
+
+        foreach (static::NUMBER_FIELDS as $alias) {
+            $field = static::getRealField($alias);
+            if (($value = Arr::get($return, $field)) !== null) {
+                Arr::set($return, $field, $value * 1);
+            }
+        }
+
+        return $return;
+    }
+    static function getRealField($alias)
+    {
+        return array_flip(static::ALIAS)[$alias] ?? null;
     }
 }

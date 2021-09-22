@@ -46,11 +46,17 @@ class MockupController extends Controller
 
        return view('Mockup.RenderMockup')->with(compact('mockup'));
     }
+    public function test(Request $request)
+    {
+        $param= $request->all();
+        $file = $param['myFile'];
+       
+        return $file;
+    }
     public function render(Request $request,$mockupId)
     {
         $param= $request->all();
         $design=$param['image'] ?? null;
-
         $moc = $this->mockup->find($mockupId);
         $type = $moc->mockupType['type_name'];
         $side = $moc->mockup_side;
@@ -81,11 +87,20 @@ class MockupController extends Controller
 
         $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg"; //local
         $render->writeImages($path, true);
+        $imagePath ="storage/app/public/cache/".$image.".jpg";
+        return $imagePath;
+
         $request->session()->put('image', $image);
         $request->session()->put('mockupId', $mockupId);
         return Redirect::to('/image-render');
         //echo $design."<br>".$mockup."<br>".$side."<br>".$type."<br>";
     }
+
+    public function imageRender()
+    {
+        return view('Mockup.Render');
+    }
+
     public function insert()
     {
         $mockupTypes= $this->mockupType->get();
@@ -137,9 +152,6 @@ class MockupController extends Controller
         ]);
         $mockup= $this->mockupTransformer->transformItem($mockup);
         return $mockup;
-
-        
-
     }
     public function delete($mockupId)
     {
@@ -274,8 +286,5 @@ class MockupController extends Controller
         // $mockup->save();
         // return Redirect::to('/mockups')->with('success', 'Cập nhật mockup thành công !');
     }
-    public function imageRender()
-    {
-        return view('Mockup.Render');
-    }
+    
 }

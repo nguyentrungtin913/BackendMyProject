@@ -32,8 +32,7 @@ class BaseValidator
         return $this->errors;
     }
 
-   public function requireParam($key,
-    $mess)
+   public function requireParam($key, $mess)
    {
       if ($this->request->get($key) === null || $this->request->get($key) === '') {
             $this->setError(400, 'missing_param', "Missing param: `{$key}`", $mess ? $mess : 'Please enter your ' . str_replace('_', ' ', Strings::toSnakeCase($key)));

@@ -17,6 +17,7 @@ class Mockup extends BaseModel
         'mockup_side',
         'mockup_price',
         'mockup_path',
+        'mockup_ratting',
         'type_id',
     ];
 
@@ -26,7 +27,8 @@ class Mockup extends BaseModel
         'mockup_side'      => 'side',
         'mockup_price'     => 'price',
         'mockup_path'      => 'path',
-        'type_id'          =>'typeId'
+        'mockup_ratting'   => 'ratting',
+        'type_id'          => 'typeId'
     ];
 
     public function mockupType()
