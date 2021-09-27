@@ -8,6 +8,8 @@ use Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Validators\CartValidator;
 use App\Transformers\CartTransformer;
+use App\Helpers\ResponseHelper;
+use Response;
 
 class CartController extends Controller
 {
@@ -18,7 +20,7 @@ class CartController extends Controller
         $this->cartTransformer = $cartTransformer;
     }
 
-    public function index(Request $request)
+    public function index(Request $request, Response $response)
     {
         $params=$request->all();
         $userId = $params['userId'] ?? null;
@@ -32,18 +34,25 @@ class CartController extends Controller
         $query = $this->cart->includes($query, $with);
 
         $carts = $this->cartTransformer->transformCollection($query->get());
-        return $carts;
+        
+        return ResponseHelper::success($response, $carts);
+
         //return view('Cart.Cart')->with(compact('carts'));
     }
-    public function find(Request $request){
+    public function find(Request $request, Response $response){
         $params=$request->all();
-        $cartId = $params['cartId'] ?? null;
-        $cart = $this->cart->where('cart_id', $cartId)->first();
-        $cart = $this->cartTransformer->transformItem($cart);
-        if($cart){
-            return $cart;    
+        if (!$this->cartValidator->setRequest($request)->checkCartExist()) {
+            $errors = $this->cartValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
         }
-        return '{"Data" : "Not Found"}';
+        $cartId = $params['cartId'] ?? 0;
+        $cart = $this->cart->where('cart_id', $cartId)->first();
+        
+        if($cart){
+            $cart = $this->cartTransformer->transformItem($cart);
+            return ResponseHelper::success($response, $cart);    
+        }
+        return ResponseHelper::requestFailed($response); 
         //return view('Cart.EditCart')->with(compact('cart'));
     }
     public function getByUserId()
@@ -52,6 +61,22 @@ class CartController extends Controller
 
         $carts = $this->cart->where('user_id', $userId)->get();
         return view('Cart.Cart')->with(compact('carts'));
+    }
+    public function update(Request $request, Response $response)
+    {
+        $params=$request->all();
+        if (!$this->cartValidator->setRequest($request)->update()) {
+            $errors = $this->cartValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
+        $cartId = $params['cartId'] ?? 0;
+        $cartAmount = $params['cartAmount'] ?? 0;
+        $cart = $this->cart->where('cart_id', $cartId)->first();
+        if($cart->update(['cart_amount' => $cartAmount])){
+            $cart = $this->cartTransformer->transformItem($cart);
+            return ResponseHelper::success($response, $cart);    
+        }
+        return ResponseHelper::requestFailed($response);
     }
 
     public function save(Request $request)
@@ -83,11 +108,12 @@ class CartController extends Controller
             'user_id'       => $userId,
             'mockup_id'     => $mockupId,
         ]);
-        $cart= $this->cartTransformer->transformItem($cart);
-
+        if($cart){
+            $cart= $this->cartTransformer->transformItem($cart);
+            return ResponseHelper::success($response, $cart);    
+        }
+        return ResponseHelper::requestFailed($response); 
         
-
-        return $cart;
 
         //return Redirect::to('/cart')->with('success', 'Thêm  thành công !');
     }
@@ -95,6 +121,11 @@ class CartController extends Controller
     public function delete(Request $request)
     {
         $params=$request->all();
+        if (!$this->cartValidator->setRequest($request)->checkCartExist()) {
+            $errors = $this->cartValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
+
         $cartId = $params['cartId'] ?? 0;
         $cart = $this->cart->where('cart_id', $cartId)->first();
         $folder = md5($cart->user_id);
@@ -102,9 +133,14 @@ class CartController extends Controller
         if (file_exists($path)) {
             unlink($path);
         }
-        $cart->delete();
-        $cart= $this->cartTransformer->transformItem($cart);
-        return $cart;
+        //$cart->delete();
+        
+        if($this->cart->where('cart_id', $cartId)->update(['cart_deleted' => 1])){
+            $cart= $this->cartTransformer->transformItem($cart);
+            return ResponseHelper::success($response, $cart);    
+        }
+        return ResponseHelper::requestFailed($response); 
+        
         //return Redirect::to('/cart')->with('success', 'Delete thành công !');
     }
 }

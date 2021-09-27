@@ -4,12 +4,16 @@
 namespace App\Validators;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Cart;
+use App\Models\User;
 class OrderValidator extends BaseValidator
 {
 
-    public function __construct(Order $order)
+    public function __construct(Order $order, Cart $cart, User $user)
     {
-        $this->order= $order;
+        $this->order = $order;
+        $this->cart  = $cart;
+        $this->user  = $user;
     }
 
     public function requireName()
@@ -22,10 +26,7 @@ class OrderValidator extends BaseValidator
         return $this->requireParam('address', 'Please enter address');
     }
 
-    public function checkAmount()
-    {
-        return $this->checkNumeric('amount', 'Please enter amount');
-    }
+    
     public function checkManyId($arr)
     {
         $key = array_keys($arr);
@@ -59,7 +60,7 @@ class OrderValidator extends BaseValidator
     public function checkId($id){
         if(!$this->order->where('order_id', $id)->first())
         {
-            $this->setError(400, 'invalid_param', "Invalid param: order ", "Order invalid");
+            $this->setError(400, 'invalid_param', "Order not exist", "Order not exist");
             return false;
         }
         return true;
@@ -79,8 +80,30 @@ class OrderValidator extends BaseValidator
             return true;
         }
     }
+    public function checkUserExist()
+    {
+        $userId = $this->request->get('userId') ?? 0;
+        $user = $this->user->where(["user_id" => $userId])->first();
+        if(!$user){
+            $this->setError(400, 'User not exist', "User not exist", 'Error');
+            return false;
+        }else{
+            return true;
+        }
+    }
+    public function checkCartNotEmpty()
+    {
+        $userId = $this->request->get('userId') ?? 0;
+        $cart = $this->cart->where(["user_id" => $userId])->first();
+        if(!$cart){
+            $this->setError(400, 'Cart empty', "Cart empty", 'Error');
+            return false;
+        }else{
+            return true;
+        }
+    }
     public function store(){
-        if (!$this->requireName() || !$this->requireAddress() || !$this->checkAmount()) {
+        if (!$this->requireName() || !$this->requireAddress() || !$this->checkUserExist() || !$this->checkCartNotEmpty()) {
             return false;
         } else {
             return true;

@@ -10,7 +10,7 @@ use App\Transformers\UserTransformer;
 use App\Validators\UserValidator;
 use Auth;
 use Session;
-
+use Response;
 session_start();
 use Illuminate\Support\Facades\Redirect;
 class UserController extends Controller
@@ -27,45 +27,62 @@ class UserController extends Controller
     {
         return view('Login');
     }
-    public function authenticate(Request $request)
+    public function authenticate(Request $request, Response $response)
     {
         $params = $request->all();
         $email = $params['email'];
         $password = md5($params['password']);
-        $user = $this->user->where([['email',$email],['password',$password]] )->first();
+        $user = $this->user->where([['user_email',$email],['user_password',$password]] )->first();
         $token = sha1(time());
         if($user){
-            $result = 
-                    '{
-                        "id" : '.$user->id.',
-                        "name" : "'.$user->name.'",
-                        "status" : "success",
-                        "customer" : '.$user->role.',
-                        "token" : "'.$token.'"
-                    }';
-            $user->token = $token;
-            $user->save();
-            return $result;
+            $result = [
+                        'id'        => $user->user_id,
+                        'name'      => $user->user_name,
+                        'status'    => 'success',
+                        'customer'  => $user->user_role,
+                        'token'     => $token
+                    ];
+            if($this->user->where(['user_email'=>$email])->update(['user_token'=>$token])){
+                return ResponseHelper::success($response, $result);
+            }else{
+                return ResponseHelper::requestFailed($response);
+            } 
+             
+        }else{
+            $errors =   [
+                            'status' => 404,
+                            'errors' => [
+                                            [
+                                                'status'    => 'fail',
+                                                'msg'       => 'Email or Password not exactly',
+                                                'clientMsg' => 'Email or Password not exactly'
+                                            ]
+                                        ]
+                        ]; 
+            return ResponseHelper::errors($response, $errors);
         }
-        return '{
-                    "status" : "fail",
-                    "message" : "Email or Password not exactly"
-                }';   
     }
 
     public function logout(Request $request)
     {
-        return '{"status": "fail"}';
+        $errors =   [
+                            'status' => 404,
+                            'errors' => [
+                                            [
+                                                'status'    => 'fail',
+                                            ]
+                                        ]
+                        ]; 
+            return ResponseHelper::errors($response, $errors);
     }
 
-    public function save(Request $request)
+    public function save(Request $request, Response $response)
     {
         $params = $request->all();
 
         if (!$this->userValidator->setRequest($request)->store()) {
             $errors = $this->userValidator->getErrors();
-          
-            return compact('errors');
+            return ResponseHelper::errors($response, $errors);
         }
 
         $pass = md5($params['password']);
@@ -83,9 +100,9 @@ class UserController extends Controller
 
         $user = $this->userTransformer->transformItem($user);
 
-        return $user;
+        return ResponseHelper::success($response, $user);
     }
-    public function index(Request $request)
+    public function index(Request $request, Response $response)
     {
         $params=$request->all();
         $perPage = $params['perPage'] ?? 0;
@@ -97,34 +114,42 @@ class UserController extends Controller
         $users = $this->user->includes($query,$with)->get();
 
         $data = DataHelper::getList($query, $this->userTransformer,$perPage,'ListAlluser');
-        $users= $this->userTransformer->transformCollection($query->get());
-        return $data;
+        return ResponseHelper::success($response, $data);
+
     }
-    public function find(Request $request)
-    {
-         $params=$request->all();
-         $id = $params['id'] ;
-         $user = $this->user->where("id", $id)->first();
-         if($user){
-            $user= $this->userTransformer->transformItem($user);
-            return $user;
-         }
-         return '{"data" : "Not Found"}';  
-    }
-    public function delete(Request $request)
+    public function find(Request $request, Response $response)
     {
         $params=$request->all();
-        $params=$this->user->revertAlias($params);
-        return $params;
-        
-         $id = $params['id'] ;
-         $user = $this->user->where("id", $id)->first();
-         if($user){
-            $user->delete();
+        if (!$this->userValidator->setRequest($request)->checkUserExist()) {
+            $errors = $this->userValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
+
+        $id = $params['userId'] ;
+        $user = $this->user->where("user_id", $id)->first();
+        if($user){
             $user= $this->userTransformer->transformItem($user);
-            $data = $this->responseHelper->success($user);
-            return $data;
-         }
-         return '{"data" : "Not Found"}';  
+            return ResponseHelper::success($response, $user);
+        }
+        return ResponseHelper::requestFailed($response); 
+    }
+    public function delete(Request $request, Response $response)
+    {
+        // $params=$this->user->revertAlias($params);
+        // return $params;
+        $params=$request->all();
+        if (!$this->userValidator->setRequest($request)->checkUserExist()) {
+            $errors = $this->userValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
+        $userId = $params['userId'] ;
+        $user = $this->user->where("user_id", $userId)->first();
+        if($user){
+            //$user->delete();
+            $this->user->where('user_id', $userId)->update(['user_deleted' => 1]);
+            $data= $this->userTransformer->transformItem($user);
+            return ResponseHelper::success($response, $data);
+        }
+        return ResponseHelper::requestFailed($response); 
     }
 }

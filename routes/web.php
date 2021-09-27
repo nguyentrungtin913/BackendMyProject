@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+
+
+Route::get('/mail','App\Http\Controllers\MailController@sendMail');
+Route::get('/find-otp','App\Http\Controllers\MailController@findOTP');
+
 //social
 Route::get('/get-info-facebook/{social}', 'App\Http\Controllers\SocialController@getInfo' );
 Route::get('/check-info-facebook/{social}', 'App\Http\Controllers\SocialController@callback_facebook' );
@@ -15,11 +20,15 @@ Route::get('/orders','App\Http\Controllers\OrderController@index');
 Route::get('/order','App\Http\Controllers\OrderController@find');
 Route::put('/order','App\Http\Controllers\OrderController@updateStatus');
 Route::delete('/order','App\Http\Controllers\OrderController@delete');
+Route::post('/order','App\Http\Controllers\OrderController@save');
+
+//order detail
+Route::get('/export-order','App\Http\Controllers\OrderDetailController@exportDetailOrder');
 
 Route::post('/many-updates','App\Http\Controllers\OrderController@manyUpdate');
 Route::post('/update','App\Http\Controllers\OrderController@Update');
 Route::get('/create-order/{cartId}','App\Http\Controllers\OrderController@insert');
-Route::post('/save-order','App\Http\Controllers\OrderController@save');
+
 //Route::get('/order','App\Http\Controllers\OrderController@getByUserId');
 
 
@@ -27,6 +36,7 @@ Route::post('/save-order','App\Http\Controllers\OrderController@save');
 Route::post('/cart','App\Http\Controllers\CartController@save');
 Route::get('/carts','App\Http\Controllers\CartController@index');
 Route::get('/cart','App\Http\Controllers\CartController@find');
+Route::put('/cart','App\Http\Controllers\CartController@update');
 Route::delete('/cart','App\Http\Controllers\CartController@delete');
 //user
 Route::get('/login','App\Http\Controllers\UserController@login');
@@ -57,8 +67,12 @@ Route::get('/delete-product-type/{typeId}','App\Http\Controllers\ProductTypeCont
 //mockup
 Route::get('/mockups','App\Http\Controllers\MockupController@index');
 Route::post('/mockup','App\Http\Controllers\MockupController@save');
-Route::get('/mockup/{mockupId}','App\Http\Controllers\MockupController@find');
+Route::get('/mockup','App\Http\Controllers\MockupController@find');
 Route::put('/mockup','App\Http\Controllers\MockupController@update');
+Route::delete('/mockup','App\Http\Controllers\MockupController@delete');
+
+
+
 Route::post('/test-mk','App\Http\Controllers\MockupController@test');
 
 Route::get('/show-mockup/{mockupId}','App\Http\Controllers\MockupController@show');
@@ -66,16 +80,15 @@ Route::get('/show-mockup/{mockupId}','App\Http\Controllers\MockupController@show
 Route::post('/render/{mockupId}','App\Http\Controllers\MockupController@render');
 Route::get('/create-mockup','App\Http\Controllers\MockupController@insert');
 
-Route::delete('/mockup/{mockupId}','App\Http\Controllers\MockupController@delete');
 Route::post('/update-mockup/{mockupId}','App\Http\Controllers\MockupController@update');
 Route::get('/image-render/','App\Http\Controllers\MockupController@imageRender');
 
 
 //mockuptype
-
+//x
 Route::get('/mockup-types','App\Http\Controllers\MockupTypeController@index');
 Route::post('/mockup-type','App\Http\Controllers\MockupTypeController@save');
 Route::put('/mockup-type','App\Http\Controllers\MockupTypeController@update');
 
-Route::get('/mockup-type/{typeId}','App\Http\Controllers\MockupTypeController@find');
-Route::delete('/mockup-type/{typeId}','App\Http\Controllers\MockupTypeController@delete');
+Route::get('/mockup-type','App\Http\Controllers\MockupTypeController@find');
+Route::delete('/mockup-type','App\Http\Controllers\MockupTypeController@delete');

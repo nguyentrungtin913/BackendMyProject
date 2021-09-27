@@ -19,6 +19,7 @@ class Mockup extends BaseModel
         'mockup_path',
         'mockup_ratting',
         'type_id',
+        'mockup_delete'
     ];
 
     const ALIAS = [
@@ -31,8 +32,21 @@ class Mockup extends BaseModel
         'type_id'          => 'typeId'
     ];
 
+    static function query()
+    {
+        $query = parent::query();
+        $query->notDeleted();
+        return $query;
+    }
+
+    function scopeNotDeleted($query)
+    {
+        return $query->where('mockup_deleted', 0);
+    }
+
     public function mockupType()
     {
         return $this->belongsTo(MockupType::class,'type_id','type_id');
     }
+
 }

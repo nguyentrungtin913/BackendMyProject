@@ -15,13 +15,16 @@ class Cart extends BaseModel
     protected $fillable = [
         'cart_id',
         'cart_image',
+        'cart_amount',
         'mockup_id',
-        'user_id'
+        'user_id',
+        'cart_delete'
     ];
 
     const ALIAS = [
         'cart_id'       => 'id',
         'cart_image'    => 'image',
+        'cart_amount'   => 'amount',
         'mockup_id'     => 'mockupId',
         'user_id'       => 'userId',
     ];

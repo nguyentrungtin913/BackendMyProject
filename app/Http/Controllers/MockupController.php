@@ -7,22 +7,25 @@ use App\Models\Mockup;
 use App\Models\MockupType;
 use App\Helpers\APIRender;
 use App\Helpers\Random;
+use Response;
 use App\Helpers\DataHelper;
+use App\Helpers\ResponseHelper;
 use ImageMagick\MagickCoderErrorException;
 use Illuminate\Support\Facades\Redirect;
 use App\Transformers\MockupTransformer;
-
+use App\Validators\MockupValidator;
 class MockupController extends Controller
 {
-    public function __construct(Mockup $mockup,MockupType $mockupType, APIRender $apiRender, Random $random, MockupTransformer $mockupTransformer)
+    public function __construct(Mockup $mockup,MockupType $mockupType, APIRender $apiRender, Random $random, MockupTransformer $mockupTransformer, MockupValidator $mockupValidator)
     {
        $this->mockup= $mockup;
        $this->mockupType= $mockupType;
        $this->apiRender = $apiRender;
        $this->random = $random;
        $this->mockupTransformer = $mockupTransformer;
+       $this->mockupValidator = $mockupValidator;
     }
-    public function index(Request $request)
+    public function index(Request $request, Response $response)
     {
         $params=$request->all();
         $perPage = $params['perPage'] ?? 0;
@@ -34,27 +37,27 @@ class MockupController extends Controller
 
         // $mockups = $this->mockup->includes($query,$with)->get();
 
-        $data = DataHelper::getList($query, $this->mockupTransformer,$perPage,'ListAllMockup');
-        $mockups= $this->mockupTransformer->transformCollection($query->get());
-        return $data;
+        $data = DataHelper::getList($query, $this->mockupTransformer, $perPage,'ListAllMockup');
+        //$mockups= $this->mockupTransformer->transformCollection($query->get());
+        return ResponseHelper::success($response, $data);
 
         // return view('Mockup.Mockup')->with(compact('mockups'));
     }
-    public function show($mockupId)
-    {
-       $mockup = $this->mockup->find($mockupId);
+    // public function show($mockupId)
+    // {
+    //    $mockup = $this->mockup->find($mockupId);
 
-       return view('Mockup.RenderMockup')->with(compact('mockup'));
-    }
-    public function test(Request $request)
-    {
-        $param= $request->all();
-        $file = $param['myFile'];
+    //    return view('Mockup.RenderMockup')->with(compact('mockup'));
+    // }
+    // public function test(Request $request)
+    // {
+    //     $param= $request->all();
+    //     $file = $param['myFile'];
        
-        return $file;
-    }
-    public function render(Request $request,$mockupId)
-    {
+    //     return $file;
+    // }
+    public function render(Request $request, Response $response, $mockupId)
+    { 
         $param= $request->all();
         $design=$param['image'] ?? null;
         $moc = $this->mockup->find($mockupId);
@@ -88,7 +91,7 @@ class MockupController extends Controller
         $path="./htdocs/MyProject/public/storage/app/public/cache/".$image.".jpg"; //local
         $render->writeImages($path, true);
         $imagePath ="storage/app/public/cache/".$image.".jpg";
-        return $imagePath;
+        return ResponseHelper::success($response, compact('imagePath'), 'Success! Render mockup succsess');
 
         $request->session()->put('image', $image);
         $request->session()->put('mockupId', $mockupId);
@@ -109,39 +112,43 @@ class MockupController extends Controller
     public function save(Request $request)
     {
         $param = $request->all();
+
+        if (!$this->mockupValidator->setRequest($request)->store()) {
+            $errors = $this->mockupValidator->getErrors();
+            return compact('errors');
+        }
+
         $mockupType=$this->mockupType->where('type_id', $param['type'])->first();
 
         //Gui bang JSON
 
-        $image =request('image');
+        // $image =request('image');
    
-        $clientOriginalExtension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+        // $clientOriginalExtension = explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
 
-        $newImage =  $param['name'].'.'.$clientOriginalExtension;
+        // $newImage =  $param['name'].'.'.$clientOriginalExtension;
 
-        $folder = 'storage/app/public/mockup/'.$mockupType->type_name.'/';
+        // $folder = 'storage/app/public/mockup/'.$mockupType->type_name.'/';
 
-        if(!is_dir($folder)){
-            mkdir($folder, 0777, true);
-        }
+        // if(!is_dir($folder)){
+        //     mkdir($folder, 0777, true);
+        // }
 
-        \Image::make($request->get('image'))->save(public_path($folder).$newImage);
+        // \Image::make($request->get('image'))->save(public_path($folder).$newImage);
 
-        $path =$folder.$newImage;
+        // $path =$folder.$newImage;
 
 
 
-        /*
+        
         //Gui bang form
 
         $get_image = request('image');
         $new_image =  $param['name'].'.'.$get_image->getClientOriginalExtension();
         $path ='storage/app/public/mockup/'.$mockupType->type_name.'/'.$new_image;
         $get_image->move('storage/app/public/mockup/'.$mockupType->type_name.'/',$new_image);
-        */
+        
 
-
-       
         //return Redirect::to('/mockups')->with('success', 'Thêm mockup thành công !');
         $mockup = $this->mockup->create([
                 'mockup_name' => $param['name'],
@@ -153,31 +160,50 @@ class MockupController extends Controller
         $mockup= $this->mockupTransformer->transformItem($mockup);
         return $mockup;
     }
-    public function delete($mockupId)
+    public function delete(Request $request, Response $response)
     {
-        $mockup = $this->mockup->find($mockupId);
-
         //$mockupType=$this->mockupType->where('type_id',$mockup->mockup_type)->first();
 
+        $params = $request->all();
+        $mockupId = $params['id'] ?? [];
+        if (!$this->mockupValidator->findMockup($mockupId)) {
+            $errors = $this->mockupValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
 
+        $mockup = $this->mockup->find($mockupId);
         $destinationPath = 'storage/app/public/mockup/'.$mockup->mockupType['type_name'].'/'.$mockup->mockup_name;
-        //|| $destinationPath!='storage/app/public/mockup/'.$mockupType->type_name.'/'
+
         if (file_exists($destinationPath)){
             unlink($destinationPath);
         }
-        $mockup->delete();
-        $mockup= $this->mockupTransformer->transformItem($mockup);
-        return $mockup;
+        //$mockup->delete();
+        if($this->mockup->where('mockup_id', $mockupId)->update(['mockup_deleted' => 1])){
+            $mockup= $this->mockupTransformer->transformItem($mockup);
+        
+            return ResponseHelper::success($response, compact('mockup'), 'Success! Delete mockup succsess');
+        }else
+        {
+            return ResponseHelper::requestFailed($response);
+        }
+        
         //return Redirect::to('/mockups')->with('success', 'xóa mockup thành công !');
     }
-    public function find($mockupId, Request $request)
+    public function find(Request $request, Response $response)
     {
         $params = $request->all();
+        $mockupId = $params['id'] ?? [];
+        if (!$this->mockupValidator->findMockup($mockupId)) {
+            $errors = $this->mockupValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
+
         $with = $params['with'] ?? [];
         $query = $this->mockup->where('mockup_id',$mockupId);
         $mockup = $this->mockup->includes($query,$with)->first();
         $mockup= $this->mockupTransformer->transformItem($mockup);
-        return $mockup;
+        return ResponseHelper::success($response, compact('mockup'));
+        //return $mockup;
     }
     public function update(Request $request)
     {

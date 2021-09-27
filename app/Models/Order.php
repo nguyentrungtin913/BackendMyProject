@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\belongsTo;
 class Order extends BaseModel
 {
     use HasFactory;
-    protected $table='tb_order';
+    protected $table='order_customer';
     protected $primaryKey = 'order_id';
     public $timestamps = false;
     protected $fillable = [
@@ -18,6 +18,7 @@ class Order extends BaseModel
         'order_status',
         'order_date',
         'user_id',
+        'order_delete'
     ];
 
     const ALIAS = [
@@ -29,6 +30,18 @@ class Order extends BaseModel
         'order_date'      => 'date',
         'user_id'         => 'userId'
     ];
+
+    static function query()
+    {
+        $query = parent::query();
+        $query->notDeleted();
+        return $query;
+    }
+
+    function scopeNotDeleted($query)
+    {
+        return $query->where('order_deleted', 0);
+    }
 
     public function user()
     {

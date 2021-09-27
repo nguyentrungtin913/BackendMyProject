@@ -13,16 +13,30 @@ class OrderDetail extends BaseModel
     public $timestamps = false;
 
     protected $fillable = [
-        'image',
-        'price',
-        'amount'
+        'order_id',
+        'detail_image',
+        'detail_price',
+        'detail_amount',
+        'detail_delete'
     ];
 
+    static function query()
+    {
+        $query = parent::query();
+        $query->notDeleted();
+        return $query;
+    }
+
+    function scopeNotDeleted($query)
+    {
+        return $query->where('detail_deleted', 0);
+    }
+
     const ALIAS = [
-        'detail_id'       => 'idOderDetail',
-        'order_id'        => 'idOder',
-        'image'           => 'imageDetail',
-        'price'           => 'priceDetail',
-        'amount'          => 'amountDetail'
+        'detail_id'              => 'idOderDetail',
+        'order_id'               => 'idOder',
+        'detail_image'           => 'imageDetail',
+        'detail_price'           => 'priceDetail',
+        'detail_amount'          => 'amountDetail'
     ];
 }

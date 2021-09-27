@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Underscore\Types\Arrays;
 use Illuminate\Support\Arr;
+use App\Helpers\S3Helper;
 
 class BaseModel extends Model
 {
@@ -121,5 +122,21 @@ class BaseModel extends Model
     static function getRealField($alias)
     {
         return array_flip(static::ALIAS)[$alias] ?? null;
+    }
+    
+    function getLinkS3($filePath, $checkExisted = 0)
+    {
+        $s3Dir = !empty(getenv('S3_DIR')) ? substr("/" . getenv('S3_DIR'), 0, -1)  : '';
+        $s3Url = getenv('S3_DESIGN_URL') . $s3Dir .  "/{$filePath}";
+
+        if ($checkExisted == 1) {
+            if (S3Helper::getObjectUrl($s3Url)) {
+                return $s3Url;
+            } else {
+                return $this->getImageUrl($filePath);
+            }
+        } else {
+            return $s3Url;
+        }
     }
 }

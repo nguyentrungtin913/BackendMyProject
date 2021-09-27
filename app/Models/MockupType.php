@@ -17,7 +17,20 @@ class MockupType extends BaseModel
 
     protected $fillable = [
         'type_name',
+        'type_delete'
     ];
+    static function query()
+    {
+        $query = parent::query();
+        $query->notDeleted();
+        return $query;
+    }
+
+    function scopeNotDeleted($query)
+    {
+        return $query->where('type_deleted', 0);
+    }
+
     public function mockup()
     {
         return $this->hasMany(Mockup::class, 'type_id', 'type_id');

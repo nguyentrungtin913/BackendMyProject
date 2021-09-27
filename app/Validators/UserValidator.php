@@ -3,9 +3,14 @@
 
 namespace App\Validators;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserValidator extends BaseValidator
 {
+    public function __construct(User $user)
+    {
+        $this->user= $user;
+    }
    
     public function requireData()
     {
@@ -52,6 +57,15 @@ class UserValidator extends BaseValidator
         } else {
             return true;
         }
+    }
+    public function checkUserExist()
+    {
+        $id = $this->request->get('userId');
+        if (!$this->user->where('user_id',$id)->first()) {
+            $this->setError(400, 'invalid_param', "User not exist", "User not exist");
+            return false;
+        }
+        return true;
     }
 }
 

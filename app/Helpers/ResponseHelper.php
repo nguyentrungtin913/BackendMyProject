@@ -4,8 +4,8 @@
 namespace App\Helpers;
 
 
-use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\Response;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 class ResponseHelper
 {
     /**
@@ -61,7 +61,7 @@ class ResponseHelper
      */
     static function response(Response $response, $data, $status)
     {
-        return $response->json($data, $status)/*
+        return $response::json($data, $status)/*
             ->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Headers', '*')
             ->withHeader('Access-Control-Allow-Credentials', 'true')
