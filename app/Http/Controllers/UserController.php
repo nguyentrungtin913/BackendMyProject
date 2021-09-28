@@ -8,72 +8,59 @@ use App\Helpers\DataHelper;
 use App\Helpers\ResponseHelper;
 use App\Transformers\UserTransformer;
 use App\Validators\UserValidator;
+use App\Validators\AuthValidator;
 use Auth;
 use Session;
 use Response;
 session_start();
+
 use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\MailController;
 class UserController extends Controller
 {
-    public function __construct(User $user, UserTransformer $userTransformer, UserValidator $userValidator, ResponseHelper $responseHelper)
+
+    public function __construct(User $user, UserTransformer $userTransformer, UserValidator $userValidator, AuthValidator $authValidator, ResponseHelper $responseHelper, MailController $mailController)
     {
         $this->user= $user;
         $this->userTransformer = $userTransformer;
         $this->userValidator = $userValidator;
+        $this->authValidator = $authValidator;
         $this->responseHelper = $responseHelper;
-
+        $this->mailController = $mailController;
     }
-    public function login()
-    {
-        return view('Login');
-    }
+    // public function login()
+    // {
+    //     return view('Login');
+    // }
     public function authenticate(Request $request, Response $response)
     {
-        $params = $request->all();
-        $email = $params['email'];
-        $password = md5($params['password']);
-        $user = $this->user->where([['user_email',$email],['user_password',$password]] )->first();
-        $token = sha1(time());
-        if($user){
-            $result = [
-                        'id'        => $user->user_id,
-                        'name'      => $user->user_name,
-                        'status'    => 'success',
-                        'customer'  => $user->user_role,
-                        'token'     => $token
-                    ];
-            if($this->user->where(['user_email'=>$email])->update(['user_token'=>$token])){
-                return ResponseHelper::success($response, $result);
-            }else{
-                return ResponseHelper::requestFailed($response);
-            } 
-             
-        }else{
-            $errors =   [
-                            'status' => 404,
-                            'errors' => [
-                                            [
-                                                'status'    => 'fail',
-                                                'msg'       => 'Email or Password not exactly',
-                                                'clientMsg' => 'Email or Password not exactly'
-                                            ]
-                                        ]
-                        ]; 
+        if (!$this->authValidator->setRequest($request)->auth()) {
+            $errors = $this->authValidator->getErrors();
             return ResponseHelper::errors($response, $errors);
         }
+
+        $params = $request->all();
+        $email = $params['email'];
+        $user = $this->user->where(['user_email' => $email])->first();
+        if($user){
+            $user = $this->userTransformer->transformItem($user);
+            return ResponseHelper::success($response, $user);
+        }
+        return ResponseHelper::requestFailed($response);
     }
 
     public function logout(Request $request)
     {
-        $errors =   [
-                            'status' => 404,
-                            'errors' => [
-                                            [
-                                                'status'    => 'fail',
-                                            ]
-                                        ]
-                        ]; 
-            return ResponseHelper::errors($response, $errors);
+        dd(response()->json($request->headers));
+        $errors = [
+                    'status' => 404,
+                    'errors' => [
+                                    [
+                                        'status'    => 'fail',
+                                    ]
+                                ]
+                ]; 
+        return ResponseHelper::errors($response, $errors);
     }
 
     public function save(Request $request, Response $response)
@@ -86,21 +73,24 @@ class UserController extends Controller
         }
 
         $pass = md5($params['password']);
-
+   
         $user = $this->user->create([
-            'name' => $params['name'],
-            'date' => $params['date'],
-            'sex' => $params['sex'],
-            'address' => $params['address'],
-            'phone' => $params['phone'],
-            'role' => $params['role'],
-            'email' => $params['email'],
-            'password' => $pass,
+            'user_name'      => $params['name'],
+            'user_date'      => $params['date'],
+            'user_sex'       => $params['sex'],
+            'user_address'   => $params['address'],
+            'user_phone'     => $params['phone'],
+            'user_role'      => $params['role'],
+            'user_email'     => $params['email'],
+            'user_password'  => $pass,
         ]);
-
-        $user = $this->userTransformer->transformItem($user);
-
-        return ResponseHelper::success($response, $user);
+        if($user){
+            $this->mailController->sendMail($request, $response);
+            $user = $this->userTransformer->transformItem($user);
+            return ResponseHelper::success($response, $user);
+        }
+        return ResponseHelper::requestFailed($response); 
+        
     }
     public function index(Request $request, Response $response)
     {
@@ -149,6 +139,21 @@ class UserController extends Controller
             $this->user->where('user_id', $userId)->update(['user_deleted' => 1]);
             $data= $this->userTransformer->transformItem($user);
             return ResponseHelper::success($response, $data);
+        }
+        return ResponseHelper::requestFailed($response); 
+    }
+
+    public function resetPassword(Request $request, Response $response)
+    {
+        $params=$request->all();
+        if (!$this->userValidator->setRequest($request)->resetPassword()) {
+            $errors = $this->userValidator->getErrors();
+            return ResponseHelper::errors($response, $errors);
+        }
+        $pass = md5($params['password']);
+        $email = $params['email'];
+        if($this->user->where('user_email', $email)->update(['user_password'=> $pass])){
+             return response()->json(['message' => 'Password reset successfully'], 200);   
         }
         return ResponseHelper::requestFailed($response); 
     }

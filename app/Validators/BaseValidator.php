@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Respect\Validation\Exceptions\NestedValidationException;
 use Underscore\Types\Strings;
 use Respect\Validation\Validator;
+use App\Models\CodeOTP;
 class BaseValidator
 {
     protected $errors;
@@ -60,4 +61,26 @@ class BaseValidator
        return true;
     }
 
+    public function checkOTP()
+    {
+        $mailTo = $this->request->get('email') ?? null;
+        $otp = $this->request->get('otp') ?? 0;
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $time = time();
+
+        $email = CodeOTP::query()->where('code_otp_email', $mailTo)->first();
+         if($email){
+            if($email->code_otp_num == $otp){
+                if($email->code_otp_expired > $time){
+                    return true;
+                }else{
+                    $this->setError(400, 'invalid', "OTP expired", 'Error');
+                }
+            }else{
+                $this->setError(400, 'invalid', "OTP invalid", 'Error');
+            }
+         }else{
+            $this->setError(400, 'invalid', "Email invalid", 'Error');
+         }
+    }
 }

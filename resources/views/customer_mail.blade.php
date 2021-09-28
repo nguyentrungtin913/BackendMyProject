@@ -1,18 +1,19 @@
 <br/>
- 	dear Thơ 
+ 	Xin chào: {{ $name }} 
 <br/>
-	thank you for ordering with us 
+	Mã xác thực của bạn là:
+<br/>
 <br/> 
 	----------OTP----------
 	<h1>{{ $otp }}</h1>	
 	--------------------------
 <br/> 
 <br/> 
-	Thank you
+	Mã xác thực có thời hạn 5 phút.
 <br/> 
-	our contact detail as of below
+	Vui lòng không chia sẽ cho bất kì ai khác.
 <br/> 
-	ph:0123456789
+	phone: 0123456789
 <br/> 
 	email: nguyentrungtin913@gmail.com
 <br/>

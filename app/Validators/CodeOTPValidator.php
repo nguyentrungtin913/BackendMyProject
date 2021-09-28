@@ -4,12 +4,15 @@
 namespace App\Validators;
 use Illuminate\Http\Request;
 use App\Models\CodeOTP;
+use App\Models\User;
+use Validator;
 class CodeOTPValidator extends BaseValidator
 {
    
-    public function __construct(CodeOTP $codeOTP)
+    public function __construct(CodeOTP $codeOTP, User $user)
     {
         $this->codeOTP = $codeOTP;
+        $this->user = $user;
     }
 
     public function requireEmail()
@@ -17,9 +20,9 @@ class CodeOTPValidator extends BaseValidator
         return $this->requireParam('email', 'Please enter email');
     }
 
-    public function store()
+    public function sendMail()
     {
-        if (!$this->requireEmail()) {
+        if (!$this->requireEmail() || !$this->checkEmailExist()) {
             return false;
         } else {
             return true;
@@ -32,32 +35,44 @@ class CodeOTPValidator extends BaseValidator
         return $this->requireParam('otp', 'Please enter OTP');
     }
 
-    public function checkData()
+    public function validEmail()
     {
-        $mailTo = $this->request->get('email') ?? null;
-        $otp = $this->request->get('otp') ?? 0;
-        date_default_timezone_set('Asia/Ho_Chi_Minh');
-        $time = time();
+        try {
+            $validator = Validator::make($this->request->all(), [
+            'email'=>'required|email'
+            ]);
 
-        $email = $this->codeOTP->where('code_otp_email', $mailTo)->first();
-         if($email){
-            if($email->code_otp_num == $otp){
-                if($email->code_otp_end > $time){
-                    return true;
-                }else{
-                    $this->setError(400, 'invalid', "OTP expired", 'Error');
-                }
-            }else{
-                $this->setError(400, 'invalid', "OTP invalid", 'Error');
+        } catch (NestedValidationException $exception) {
+            foreach ($exception->getMessages() as $message) {
+                $this->setError(400, 'invalid_param', 'Invalid param: `email`. ' . $message, $message);
             }
-         }else{
-            $this->setError(400, 'invalid', "Email invalid", 'Error');
-         }
+            return false;
+        }
     }
 
-    public function find()
+    public function checkEmailExist()
     {
-        if (!$this->requireEmail() || !$this->requireOTP() || !$this->checkData()) {
+        $email = $this->request->get('email');
+        $user = $this->user->where('user_email', $email)->first();
+        if($user){
+            return true;
+        }else{
+            $this->setError(400, 'invalid_param', 'Email not created account', 'Please create an account before verifying');
+            return false;
+        }
+
+    }
+
+    public function checkData()
+    {
+        return $this->checkOTP();
+    }
+
+
+
+    public function activate()
+    {
+        if (!$this->requireEmail() || !$this->checkEmailExist() || !$this->requireOTP() || !$this->checkData()) {
             return false;
         } else {
             return true;

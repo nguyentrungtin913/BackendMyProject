@@ -10,10 +10,9 @@ use Illuminate\Notifications\Notifiable;
 class User extends BaseModel //Authenticatable
 {
     use HasFactory, Notifiable;
-    const NUMBER_FIELDS = ['id', 'id'];
     protected $table = 'users';
     public $timestamps = false;
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'user_id';
 
     protected $fillable = [
         'user_name',
@@ -24,7 +23,10 @@ class User extends BaseModel //Authenticatable
         'user_role',
         'user_email',
         'user_password',
-        'user_delete'
+        'user_token',
+        'user_token_expired',
+        'user_delete',
+        'user_activated'
 
     ];
     
@@ -41,13 +43,15 @@ class User extends BaseModel //Authenticatable
     }
 
     const ALIAS = [
-        'user_name'      => 'name',
-        'user_date'      => 'date',
-        'user_sex'       => 'sex',
-        'user_address'   => 'address',
-        'user_phone'     => 'phone',
-        'user_role'      => 'role',
-        'user_email'     => 'email'
+        'user_name'             => 'name',
+        'user_date'             => 'date',
+        'user_sex'              => 'sex',
+        'user_address'          => 'address',
+        'user_phone'            => 'phone',
+        'user_role'             => 'role',
+        'user_email'            => 'email',
+        'user_token'            => 'token',
+        'user_token_expired'    => 'tokenExpired',
     ];
     public function orders()
     {

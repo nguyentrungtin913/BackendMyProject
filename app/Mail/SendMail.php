@@ -14,6 +14,7 @@ class SendMail extends Mailable
     public $customer_details;
     public $order_details;
     public $otp;
+    public $name;
 
     /**
      * Create a new message instance.
@@ -21,10 +22,11 @@ class SendMail extends Mailable
      * @return void
      */
     
-    public function __construct($title, $otp)
+    public function __construct($title, $otp, $name)
     {
         $this->title = $title; 
-        $this->otp= $otp;
+        $this->otp   = $otp;
+        $this->name  = $name;
     }
 
     

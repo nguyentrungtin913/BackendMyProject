@@ -4,12 +4,14 @@
 namespace App\Validators;
 use Illuminate\Http\Request;
 use App\Models\User;
-
+use App\Models\CodeOTP;
+use App\Validators\CodeOTPValidator;
 class UserValidator extends BaseValidator
 {
-    public function __construct(User $user)
+    public function __construct(User $user, CodeOTPValidator $codeOTPValidator)
     {
-        $this->user= $user;
+        $this->user = $user;
+        $this->codeOTPValidator = $codeOTPValidator;
     }
    
     public function requireData()
@@ -52,13 +54,35 @@ class UserValidator extends BaseValidator
         return true;
     }
     public function store(){
-        if (!$this->requireData() || !$this->checkSex() || !$this->checkRole() || !$this->confirmPassword() ) {
+        if (!$this->requireData() || !$this->checkEmailExist() || !$this->checkSex() || !$this->checkRole() || !$this->confirmPassword() ) {
             return false;
         } else {
             return true;
         }
     }
-    public function checkUserExist()
+    public function checkEmailExist()   //return false if exist
+    {
+        $email = $this->request->get('email');
+        if ($this->user->where('user_email',$email)->first()) {
+            $this->setError(400, 'invalid_param', "Email exist", "Email already exists");
+            return false;
+        }
+        return true;
+    }
+
+    public function checkEmailNotExist()   //return false if exist
+    {
+        $email = $this->request->get('email');
+        if (!$this->user->where('user_email',$email)->first()) {
+            $this->setError(400, 'invalid_param', "Email not exist", "Email not exists");
+            return false;
+        }
+        return true;
+    }
+
+
+
+    public function checkUserExist()    //return false if not exist
     {
         $id = $this->request->get('userId');
         if (!$this->user->where('user_id',$id)->first()) {
@@ -66,6 +90,25 @@ class UserValidator extends BaseValidator
             return false;
         }
         return true;
+    }
+
+    public function requireDataResetPassword()
+    {
+        if(!$this->requireParam('email', 'Please enter email') || !$this->requireParam('otp', 'Please enter otp') || !$this->requireParam('password', 'Please enter password') || !$this->requireParam('passwordConfirm', 'Please enter passwordConfirm'))
+        {
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    public function resetPassword()
+    {
+        //require data, check user exist by email
+        if (!$this->requireDataResetPassword() || !$this->checkEmailNotExist() || !$this->confirmPassword() ) {
+            return false;
+        }
+        return $this->checkOTP();
     }
 }
 

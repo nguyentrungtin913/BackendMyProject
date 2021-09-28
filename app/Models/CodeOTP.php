@@ -15,14 +15,14 @@ class CodeOTP extends BaseModel
     protected $fillable = [
         'code_otp_email',
         'code_otp_num',
-        'code_otp_end'
+        'code_otp_expired'
     ];
 
     const ALIAS = [
         'code_otp_id'           => 'id',
         'code_otp_email'        => 'email',
         'code_otp_num'          => 'otp',
-        'code_otp_end'          => 'timeEnd'
+        'code_otp_expired'          => 'timeEnd'
     ];
 
 }
